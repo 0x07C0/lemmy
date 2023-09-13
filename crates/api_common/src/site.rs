@@ -61,7 +61,6 @@ pub struct Search {
   pub listing_type: Option<ListingType>,
   pub page: Option<i64>,
   pub limit: Option<i64>,
-  pub auth: Option<Sensitive<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -112,7 +111,6 @@ pub struct GetModlog {
   pub limit: Option<i64>,
   pub type_: Option<ModlogActionType>,
   pub other_person_id: Option<PersonId>,
-  pub auth: Option<Sensitive<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -183,7 +181,6 @@ pub struct CreateSite {
   pub blocked_instances: Option<Vec<String>>,
   pub taglines: Option<Vec<String>>,
   pub registration_mode: Option<RegistrationMode>,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -262,16 +259,6 @@ pub struct EditSite {
   pub registration_mode: Option<RegistrationMode>,
   /// Whether to email admins for new reports.
   pub reports_email_admins: Option<bool>,
-  pub auth: Sensitive<String>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
-#[cfg_attr(feature = "full", derive(TS))]
-#[cfg_attr(feature = "full", ts(export))]
-/// Fetches the site.
-pub struct GetSite {
-  pub auth: Option<Sensitive<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -328,9 +315,7 @@ pub struct MyUserInfo {
 #[cfg_attr(feature = "full", derive(TS))]
 #[cfg_attr(feature = "full", ts(export))]
 /// Leaves the admin team.
-pub struct LeaveAdmin {
-  pub auth: Sensitive<String>,
-}
+pub struct LeaveAdmin {}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "full", derive(TS))]
@@ -350,7 +335,6 @@ pub struct FederatedInstances {
 pub struct PurgePerson {
   pub person_id: PersonId,
   pub reason: Option<String>,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -361,7 +345,6 @@ pub struct PurgePerson {
 pub struct PurgeCommunity {
   pub community_id: CommunityId,
   pub reason: Option<String>,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -372,7 +355,6 @@ pub struct PurgeCommunity {
 pub struct PurgePost {
   pub post_id: PostId,
   pub reason: Option<String>,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -383,7 +365,6 @@ pub struct PurgePost {
 pub struct PurgeComment {
   pub comment_id: CommentId,
   pub reason: Option<String>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -404,7 +385,6 @@ pub struct ListRegistrationApplications {
   pub unread_only: Option<bool>,
   pub page: Option<i64>,
   pub limit: Option<i64>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -424,7 +404,6 @@ pub struct ApproveRegistrationApplication {
   pub id: i32,
   pub approve: bool,
   pub deny_reason: Option<String>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -433,14 +412,6 @@ pub struct ApproveRegistrationApplication {
 /// The response of an action done to a registration application.
 pub struct RegistrationApplicationResponse {
   pub registration_application: RegistrationApplicationView,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[cfg_attr(feature = "full", derive(TS))]
-#[cfg_attr(feature = "full", ts(export))]
-/// Gets a count of unread registration applications.
-pub struct GetUnreadRegistrationApplicationCount {
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

@@ -8,7 +8,6 @@ use lemmy_api_common::{
   utils::{
     check_community_ban,
     local_site_to_slur_regex,
-    local_user_view_from_jwt,
     sanitize_html_api_opt,
   },
 };
@@ -21,7 +20,7 @@ use lemmy_db_schema::{
   traits::Crud,
   utils::naive_now,
 };
-use lemmy_db_views::structs::CommentView;
+use lemmy_db_views::structs::{CommentView, LocalUserView};
 use lemmy_utils::{
   error::{LemmyError, LemmyErrorExt, LemmyErrorType},
   utils::{
@@ -35,8 +34,8 @@ use lemmy_utils::{
 pub async fn update_comment(
   data: Json<EditComment>,
   context: Data<LemmyContext>,
+  local_user_view: LocalUserView
 ) -> Result<Json<CommentResponse>, LemmyError> {
-  let local_user_view = local_user_view_from_jwt(&data.auth, &context).await?;
   let local_site = LocalSite::read(&mut context.pool()).await?;
 
   let comment_id = data.comment_id;

@@ -5,7 +5,6 @@ use lemmy_api_common::{
   site::{PurgeCommunity, PurgeItemResponse},
   utils::{
     is_admin,
-    local_user_view_from_jwt,
     purge_image_posts_for_community,
     sanitize_html_api_opt,
   },
@@ -17,15 +16,15 @@ use lemmy_db_schema::{
   },
   traits::Crud,
 };
+use lemmy_db_views::structs::LocalUserView;
 use lemmy_utils::error::LemmyError;
 
 #[tracing::instrument(skip(context))]
 pub async fn purge_community(
   data: Json<PurgeCommunity>,
   context: Data<LemmyContext>,
+  local_user_view: LocalUserView
 ) -> Result<Json<PurgeItemResponse>, LemmyError> {
-  let local_user_view = local_user_view_from_jwt(&data.auth, &context).await?;
-
   // Only let admin purge an item
   is_admin(&local_user_view)?;
 

@@ -123,7 +123,6 @@ pub struct SaveUserSettings {
   ///
   /// None leaves it as is, true will generate or regenerate it, false clears it out.
   pub generate_totp_2fa: Option<bool>,
-  pub auth: Sensitive<String>,
   /// Open links in a new tab
   pub open_links_in_new_tab: Option<bool>,
   /// Enable infinite scroll
@@ -138,7 +137,6 @@ pub struct ChangePassword {
   pub new_password: Sensitive<String>,
   pub new_password_verify: Sensitive<String>,
   pub old_password: Sensitive<String>,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -171,7 +169,6 @@ pub struct GetPersonDetails {
   pub limit: Option<i64>,
   pub community_id: Option<CommunityId>,
   pub saved_only: Option<bool>,
-  pub auth: Option<Sensitive<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -188,19 +185,10 @@ pub struct GetPersonDetailsResponse {
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[cfg_attr(feature = "full", derive(TS))]
 #[cfg_attr(feature = "full", ts(export))]
-/// Marks all notifications as read.
-pub struct MarkAllAsRead {
-  pub auth: Sensitive<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
-#[cfg_attr(feature = "full", derive(TS))]
-#[cfg_attr(feature = "full", ts(export))]
 /// Adds an admin to a site.
 pub struct AddAdmin {
   pub person_id: PersonId,
   pub added: bool,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -223,7 +211,6 @@ pub struct BanPerson {
   pub remove_data: Option<bool>,
   pub reason: Option<String>,
   pub expires: Option<i64>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -231,9 +218,7 @@ pub struct BanPerson {
 #[cfg_attr(feature = "full", ts(export))]
 /// Get a list of banned persons.
 // TODO, this should be paged, since the list can be quite long.
-pub struct GetBannedPersons {
-  pub auth: Sensitive<String>,
-}
+pub struct GetBannedPersons {}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "full", derive(TS))]
@@ -259,7 +244,6 @@ pub struct BanPersonResponse {
 pub struct BlockPerson {
   pub person_id: PersonId,
   pub block: bool,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -281,7 +265,6 @@ pub struct GetReplies {
   pub page: Option<i64>,
   pub limit: Option<i64>,
   pub unread_only: Option<bool>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -303,7 +286,6 @@ pub struct GetPersonMentions {
   pub page: Option<i64>,
   pub limit: Option<i64>,
   pub unread_only: Option<bool>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -321,7 +303,6 @@ pub struct GetPersonMentionsResponse {
 pub struct MarkPersonMentionAsRead {
   pub person_mention_id: PersonMentionId,
   pub read: bool,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -339,7 +320,6 @@ pub struct PersonMentionResponse {
 pub struct MarkCommentReplyAsRead {
   pub comment_reply_id: CommentReplyId,
   pub read: bool,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -357,7 +337,6 @@ pub struct CommentReplyResponse {
 pub struct DeleteAccount {
   pub password: Sensitive<String>,
   pub delete_content: bool,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -397,7 +376,6 @@ pub struct PasswordChangeAfterReset {
 /// Get a count of the number of reports.
 pub struct GetReportCount {
   pub community_id: Option<CommunityId>,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -410,14 +388,6 @@ pub struct GetReportCountResponse {
   pub comment_reports: i64,
   pub post_reports: i64,
   pub private_message_reports: Option<i64>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Default)]
-#[cfg_attr(feature = "full", derive(TS))]
-#[cfg_attr(feature = "full", ts(export))]
-/// Get a count of unread notifications.
-pub struct GetUnreadCount {
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

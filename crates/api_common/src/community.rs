@@ -56,7 +56,6 @@ pub struct CreateCommunity {
   /// Whether to restrict posting only to moderators.
   pub posting_restricted_to_mods: Option<bool>,
   pub discussion_languages: Option<Vec<LanguageId>>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -79,7 +78,6 @@ pub struct ListCommunities {
   pub show_nsfw: Option<bool>,
   pub page: Option<i64>,
   pub limit: Option<i64>,
-  pub auth: Option<Sensitive<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -102,7 +100,6 @@ pub struct BanFromCommunity {
   pub remove_data: Option<bool>,
   pub reason: Option<String>,
   pub expires: Option<i64>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -122,7 +119,6 @@ pub struct AddModToCommunity {
   pub community_id: CommunityId,
   pub person_id: PersonId,
   pub added: bool,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -153,7 +149,6 @@ pub struct EditCommunity {
   /// Whether to restrict posting only to moderators.
   pub posting_restricted_to_mods: Option<bool>,
   pub discussion_languages: Option<Vec<LanguageId>>,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -166,7 +161,6 @@ pub struct HideCommunity {
   pub community_id: CommunityId,
   pub hidden: bool,
   pub reason: Option<String>,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -190,7 +184,6 @@ pub struct RemoveCommunity {
   pub removed: bool,
   pub reason: Option<String>,
   pub expires: Option<i64>,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -200,7 +193,6 @@ pub struct RemoveCommunity {
 pub struct FollowCommunity {
   pub community_id: CommunityId,
   pub follow: bool,
-  pub auth: Sensitive<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -210,7 +202,6 @@ pub struct FollowCommunity {
 pub struct BlockCommunity {
   pub community_id: CommunityId,
   pub block: bool,
-  pub auth: Sensitive<String>,
 }
 
 #[skip_serializing_none]
@@ -230,5 +221,4 @@ pub struct BlockCommunityResponse {
 pub struct TransferCommunity {
   pub community_id: CommunityId,
   pub person_id: PersonId,
-  pub auth: Sensitive<String>,
 }

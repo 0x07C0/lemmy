@@ -291,15 +291,15 @@ fn create_http_server(
       .wrap(ErrorHandlers::new().default_handler(jsonify_plain_text_errors))
       .app_data(Data::new(context.clone()))
       .app_data(Data::new(rate_limit_cell.clone()))
-      .wrap(FederationMiddleware::new(federation_config.clone()))
-      .wrap(SessionMiddleware::new(context.clone()));
+      .wrap(FederationMiddleware::new(federation_config.clone()));
 
     #[cfg(feature = "prometheus-metrics")]
     let app = app.wrap(prom_api_metrics.clone());
 
+    let auth = SessionMiddleware::new(context.clone());
     // The routes
     app
-      .configure(|cfg| api_routes_http::config(cfg, &rate_limit_cell))
+      .configure(|cfg| api_routes_http::config(cfg, &rate_limit_cell, &auth))
       .configure(|cfg| {
         if federation_enabled {
           lemmy_apub::http::routes::config(cfg);

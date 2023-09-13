@@ -119,55 +119,57 @@ use lemmy_apub::api::{
 };
 use lemmy_utils::rate_limit::RateLimitCell;
 
-pub fn config(cfg: &mut web::ServiceConfig, rate_limit: &RateLimitCell) {
+use crate::session_middleware::SessionMiddleware;
+
+pub fn config(cfg: &mut web::ServiceConfig, rate_limit: &RateLimitCell, auth: &SessionMiddleware) {
   cfg.service(
     web::scope("/api/v3")
       // Site
       .service(
         web::scope("/site")
           .wrap(rate_limit.message())
-          .route("", web::get().to(get_site))
+          .route("", web::get().to(get_site).wrap(auth.opt_auth()))
           // Admin Actions
-          .route("", web::post().to(create_site))
-          .route("", web::put().to(update_site)),
+          .route("", web::post().to(create_site).wrap(auth.auth()))
+          .route("", web::put().to(update_site).wrap(auth.auth())),
       )
       .service(
         web::resource("/modlog")
           .wrap(rate_limit.message())
-          .route(web::get().to(get_mod_log)),
+          .route(web::get().to(get_mod_log).wrap(auth.opt_auth())),
       )
       .service(
         web::resource("/search")
           .wrap(rate_limit.search())
-          .route(web::get().to(search)),
+          .route(web::get().to(search).wrap(auth.opt_auth())),
       )
       .service(
         web::resource("/resolve_object")
           .wrap(rate_limit.message())
-          .route(web::get().to(resolve_object)),
+          .route(web::get().to(resolve_object).wrap(auth.opt_auth())),
       )
       // Community
       .service(
         web::resource("/community")
           .guard(guard::Post())
           .wrap(rate_limit.register())
-          .route(web::post().to(create_community)),
+          .route(web::post().to(create_community).wrap(auth.auth())),
       )
       .service(
         web::scope("/community")
           .wrap(rate_limit.message())
-          .route("", web::get().to(get_community))
-          .route("", web::put().to(update_community))
-          .route("/hide", web::put().to(hide_community))
-          .route("/list", web::get().to(list_communities))
-          .route("/follow", web::post().to(follow_community))
-          .route("/block", web::post().to(block_community))
-          .route("/delete", web::post().to(delete_community))
+          .route("", web::get().to(get_community).wrap(auth.opt_auth()))
+          .route("", web::put().to(update_community).wrap(auth.auth()))
+          .route("/hide", web::put().to(hide_community).wrap(auth.auth()))
+          .route("/list", web::get().to(list_communities).wrap(auth.auth()))
+          .route("/follow", web::post().to(follow_community).wrap(auth.auth()))
+          .route("/block", web::post().to(block_community).wrap(auth.auth()))
+          .route("/delete", web::post().to(delete_community).wrap(auth.auth()))
           // Mod Actions
-          .route("/remove", web::post().to(remove_community))
-          .route("/transfer", web::post().to(transfer_community))
-          .route("/ban_user", web::post().to(ban_from_community))
-          .route("/mod", web::post().to(add_mod_to_community)),
+          .route("/remove", web::post().to(remove_community).wrap(auth.auth()))
+          .route("/transfer", web::post().to(transfer_community).wrap(auth.auth()))
+          .route("/ban_user", web::post().to(ban_from_community).wrap(auth.auth()))
+          .route("/mod", web::post().to(add_mod_to_community).wrap(auth.auth())),
       )
       .service(
         web::scope("/federated_instances")
@@ -180,24 +182,24 @@ pub fn config(cfg: &mut web::ServiceConfig, rate_limit: &RateLimitCell) {
         web::resource("/post")
           .guard(guard::Post())
           .wrap(rate_limit.post())
-          .route(web::post().to(create_post)),
+          .route(web::post().to(create_post).wrap(auth.auth())),
       )
       .service(
         web::scope("/post")
           .wrap(rate_limit.message())
-          .route("", web::get().to(get_post))
-          .route("", web::put().to(update_post))
-          .route("/delete", web::post().to(delete_post))
-          .route("/remove", web::post().to(remove_post))
-          .route("/mark_as_read", web::post().to(mark_post_as_read))
-          .route("/lock", web::post().to(lock_post))
-          .route("/feature", web::post().to(feature_post))
-          .route("/list", web::get().to(list_posts))
-          .route("/like", web::post().to(like_post))
-          .route("/save", web::put().to(save_post))
-          .route("/report", web::post().to(create_post_report))
-          .route("/report/resolve", web::put().to(resolve_post_report))
-          .route("/report/list", web::get().to(list_post_reports))
+          .route("", web::get().to(get_post).wrap(auth.opt_auth()))
+          .route("", web::put().to(update_post).wrap(auth.auth()))
+          .route("/delete", web::post().to(delete_post).wrap(auth.auth()))
+          .route("/remove", web::post().to(remove_post).wrap(auth.auth()))
+          .route("/mark_as_read", web::post().to(mark_post_as_read).wrap(auth.auth()))
+          .route("/lock", web::post().to(lock_post).wrap(auth.auth()))
+          .route("/feature", web::post().to(feature_post).wrap(auth.auth()))
+          .route("/list", web::get().to(list_posts).wrap(auth.opt_auth()))
+          .route("/like", web::post().to(like_post).wrap(auth.auth()))
+          .route("/save", web::put().to(save_post).wrap(auth.auth()))
+          .route("/report", web::post().to(create_post_report).wrap(auth.auth()))
+          .route("/report/resolve", web::put().to(resolve_post_report).wrap(auth.auth()))
+          .route("/report/list", web::get().to(list_post_reports).wrap(auth.auth()))
           .route("/site_metadata", web::get().to(get_link_metadata)),
       )
       // Comment
@@ -206,28 +208,29 @@ pub fn config(cfg: &mut web::ServiceConfig, rate_limit: &RateLimitCell) {
         web::resource("/comment")
           .guard(guard::Post())
           .wrap(rate_limit.comment())
-          .route(web::post().to(create_comment)),
+          .route(web::post().to(create_comment).wrap(auth.auth())),
       )
       .service(
         web::scope("/comment")
           .wrap(rate_limit.message())
-          .route("", web::get().to(get_comment))
-          .route("", web::put().to(update_comment))
-          .route("/delete", web::post().to(delete_comment))
-          .route("/remove", web::post().to(remove_comment))
-          .route("/mark_as_read", web::post().to(mark_reply_as_read))
-          .route("/distinguish", web::post().to(distinguish_comment))
-          .route("/like", web::post().to(like_comment))
-          .route("/save", web::put().to(save_comment))
-          .route("/list", web::get().to(list_comments))
-          .route("/report", web::post().to(create_comment_report))
-          .route("/report/resolve", web::put().to(resolve_comment_report))
-          .route("/report/list", web::get().to(list_comment_reports)),
+          .route("", web::get().to(get_comment).wrap(auth.opt_auth()))
+          .route("", web::put().to(update_comment).wrap(auth.auth()))
+          .route("/delete", web::post().to(delete_comment).wrap(auth.auth()))
+          .route("/remove", web::post().to(remove_comment).wrap(auth.auth()))
+          .route("/mark_as_read", web::post().to(mark_reply_as_read).wrap(auth.auth()))
+          .route("/distinguish", web::post().to(distinguish_comment).wrap(auth.auth()))
+          .route("/like", web::post().to(like_comment).wrap(auth.auth()))
+          .route("/save", web::put().to(save_comment).wrap(auth.auth()))
+          .route("/list", web::get().to(list_comments).wrap(auth.opt_auth()))
+          .route("/report", web::post().to(create_comment_report).wrap(auth.auth()))
+          .route("/report/resolve", web::put().to(resolve_comment_report).wrap(auth.auth()))
+          .route("/report/list", web::get().to(list_comment_reports).wrap(auth.auth())),
       )
       // Private Message
       .service(
         web::scope("/private_message")
           .wrap(rate_limit.message())
+          .wrap(auth.auth())
           .route("/list", web::get().to(get_private_message))
           .route("", web::post().to(create_private_message))
           .route("", web::put().to(update_private_message))
@@ -256,20 +259,20 @@ pub fn config(cfg: &mut web::ServiceConfig, rate_limit: &RateLimitCell) {
       .service(
         web::scope("/user")
           .wrap(rate_limit.message())
-          .route("", web::get().to(read_person))
-          .route("/mention", web::get().to(list_mentions))
+          .route("", web::get().to(read_person).wrap(auth.opt_auth()))
+          .route("/mention", web::get().to(list_mentions).wrap(auth.auth()))
           .route(
             "/mention/mark_as_read",
-            web::post().to(mark_person_mention_as_read),
+            web::post().to(mark_person_mention_as_read).wrap(auth.auth()),
           )
-          .route("/replies", web::get().to(list_replies))
+          .route("/replies", web::get().to(list_replies).wrap(auth.auth()))
           // Admin action. I don't like that it's in /user
-          .route("/ban", web::post().to(ban_from_site))
-          .route("/banned", web::get().to(list_banned_users))
-          .route("/block", web::post().to(block_person))
+          .route("/ban", web::post().to(ban_from_site).wrap(auth.auth()))
+          .route("/banned", web::get().to(list_banned_users).wrap(auth.auth()))
+          .route("/block", web::post().to(block_person).wrap(auth.auth()))
           // Account actions. I don't like that they're in /user maybe /accounts
           .route("/login", web::post().to(login))
-          .route("/delete_account", web::post().to(delete_account))
+          .route("/delete_account", web::post().to(delete_account).wrap(auth.auth()))
           .route("/password_reset", web::post().to(reset_password))
           .route(
             "/password_change",
@@ -278,19 +281,20 @@ pub fn config(cfg: &mut web::ServiceConfig, rate_limit: &RateLimitCell) {
           // mark_all_as_read feels off being in this section as well
           .route(
             "/mark_all_as_read",
-            web::post().to(mark_all_notifications_read),
+            web::post().to(mark_all_notifications_read).wrap(auth.auth()),
           )
-          .route("/save_user_settings", web::put().to(save_user_settings))
-          .route("/change_password", web::put().to(change_password))
-          .route("/report_count", web::get().to(report_count))
-          .route("/unread_count", web::get().to(unread_count))
+          .route("/save_user_settings", web::put().to(save_user_settings).wrap(auth.auth()))
+          .route("/change_password", web::put().to(change_password).wrap(auth.auth()))
+          .route("/report_count", web::get().to(report_count).wrap(auth.auth()))
+          .route("/unread_count", web::get().to(unread_count).wrap(auth.auth()))
           .route("/verify_email", web::post().to(verify_email))
-          .route("/leave_admin", web::post().to(leave_admin)),
+          .route("/leave_admin", web::post().to(leave_admin).wrap(auth.auth())),
       )
       // Admin Actions
       .service(
         web::scope("/admin")
           .wrap(rate_limit.message())
+          .wrap(auth.auth())
           .route("/add", web::post().to(add_admin))
           .route(
             "/registration_application/count",
@@ -315,6 +319,7 @@ pub fn config(cfg: &mut web::ServiceConfig, rate_limit: &RateLimitCell) {
       .service(
         web::scope("/custom_emoji")
           .wrap(rate_limit.message())
+          .wrap(auth.auth())
           .route("", web::post().to(create_custom_emoji))
           .route("", web::put().to(update_custom_emoji))
           .route("/delete", web::post().to(delete_custom_emoji)),
